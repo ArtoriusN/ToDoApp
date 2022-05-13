@@ -19,6 +19,7 @@
         buttonWrapper.classList.add('input-group-append');
         button.classList.add('btn', 'btn-primary');
         button.textContent = "Добавить дело";
+        button.className
 
         buttonWrapper.append(button);
         form.append(input);
@@ -36,23 +37,31 @@
         list.classList.add('list-group');
         return list;
     }
-    function createTodoItem(head) {
+    function createTodoItem(name) {
         let item = document.createElement('li');
-        let input = document.createElement('input');
+        let buttonGroup = document.createElement('div');
         let buttonDone = document.createElement('button');
-        let button2 = document.createElement('button');
+        let buttonDelete = document.createElement('button');
 
-        input.value = head;
+        //Помещаем передаваемое название в элемент списка
+        item.textContent = name;
+        item.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        
+        buttonGroup.classList.add('btn-group', 'btn-group-sm');
+        buttonDone.classList.add('btn', 'btn-success');
+        buttonDelete.classList.add('btn', 'btn-danger');
+        buttonDone.textContent = 'Готово';
+        buttonDelete.textContent = 'Удалить';
 
-        item.append(input);
-        item.append(buttonDone);
-        item.append(button2);
+        //вкладываем кнопки в div для объединения
+        buttonGroup.append(buttonDone);
+        buttonGroup.append(buttonDelete);
+        item.append(buttonGroup);
 
         return {
             item,
-            input,
             buttonDone,
-            button2,
+            buttonDelete,
         }
     }
 
@@ -62,20 +71,40 @@
         let todoAppTitle = createAppTitle('Список дел');
         let todoItemForm = createTodoItemForm();
         let todoList = createTodoList();
+        
 
         container.append(todoAppTitle);
         container.append(todoItemForm.form);
         container.append(todoList);
         // todoItemForm.form.append(createTodoItem("head").item);
         todoItemForm.form.addEventListener('submit', function (e) {
+            //предотвращаем стандартное действие браузера при отправке формы (перезагрузка страницы)
             e.preventDefault();
 
+            //игнорируем создание элемента если пользователь ничего не ввел в поле
             if (!todoItemForm.input.value) {
                 return;
             }
-            todoList.append(createTodoItem(todoItemForm.input.value).item);
-            // todoItemForm.input.value = '';
+            let todoItem = createTodoItem(todoItemForm.input.value);
 
+            todoItem.buttonDone.addEventListener("click", function (){
+                todoItem.item.classList.toggle('list-group-item-success');
+            });
+
+            todoItem.buttonDelete.addEventListener("click", function (){
+                if (confirm('Хотите удалить?')) {
+                    todoItem.item.remove();
+                }
+            });
+
+            todoList.append(todoItem.item);
+            //создаем и добавляем в список (ul) новое дело (li) с названием из поля ввода фармы
+            // todoList.append(createTodoItem(todoItemForm.input.value).item);
+
+            //обнуляем значение в поле ввода формы, чтобы пользователь не стирал
+            todoItemForm.input.value = '';
         });
+
+
     });
 })();
