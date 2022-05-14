@@ -65,7 +65,7 @@
         }
     }
 
-    function createTodoApp(container, title = 'Список дел', obj) {
+    function createTodoApp(container, title = 'Список дел', obj = {}) {
         let todoAppTitle = createAppTitle(title);
         let todoItemForm = createTodoItemForm();
         let todoList = createTodoList();
