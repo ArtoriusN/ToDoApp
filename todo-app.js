@@ -95,21 +95,16 @@
             }
         }
         function changeItemDone(arr, id) {
-            arr.map(obj => {
-                if (obj.id === id && obj.done === false) {
-                    console.log('arr');
-                    console.log(arr);
-                    console.log(obj.id);
-                    console.log(id);
-                    console.log(obj.done);
-                    obj.done = true;
-                } else {
-                    // console.log(obj.id);
-                    // console.log(id);
-                    // console.log(obj.done);
-                    obj.done = false;
-                }
-            });
+            // arr.map(obj => {
+            //     if (obj.id === id && obj.done === false) {
+            //         obj.done = true;
+            //     } else if (obj.id === id && obj.done !== false) {
+            //         obj.done = false;
+            //     }
+            // });
+            const index = id.split('id')[1];
+            arr[+index].done =!arr[+index].done;
+            
         }
         //Функция добавления и удаления дел которая вызывается при наличии значений по умолчанию или ручном вводе
         function addItemToDom(todoItem) {
