@@ -118,7 +118,8 @@
             e.preventDefault();
 
             //игнорируем создание элемента если пользователь ничего не ввел в поле
-            if (!todoItemForm.input.value) {
+            if (!todoItemForm.input.value || todoItemForm.input.value.trim() === '') {
+                todoItemForm.input.value = '';
                 return;
             }
             let todoItem = createTodoItem(todoItemForm.input.value);
