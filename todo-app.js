@@ -1,4 +1,5 @@
 (function () {
+    let idTodo = 0;
     //создаем и возвращаем заголовок приложения
     function createAppTitle(title) {
         let appTitle = document.createElement('h1');
@@ -37,6 +38,7 @@
         list.classList.add('list-group');
         return list;
     }
+    //создаем и возвращаем дело
     function createTodoItem(name) {
         let item = document.createElement('li');
         let buttonGroup = document.createElement('div');
@@ -46,6 +48,8 @@
         //Помещаем передаваемое название в элемент списка
         item.textContent = name;
         item.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        let idItem = 'id' + idTodo;
+        item.setAttribute('id','id' + idTodo++);
         
         buttonGroup.classList.add('btn-group', 'btn-group-sm');
         buttonDone.classList.add('btn', 'btn-success');
@@ -60,6 +64,7 @@
 
         return {
             item,
+            idItem,
             buttonDone,
             buttonDelete,
         }
@@ -74,7 +79,8 @@
         container.append(todoAppTitle);
         container.append(todoItemForm.form);
         container.append(todoList);
-        // todoItemForm.form.append(createTodoItem("head").item);
+
+        //Проверка на наличие значений по умолчанию (в obj) и запуск функции добавления если такие есть
         if (Object.keys(obj).length == 0) {
             console.log('пуст');
         } else {
@@ -88,14 +94,39 @@
                 }
             }
         }
-
+        function changeItemDone(arr, id) {
+            arr.map(obj => {
+                if (obj.id === id && obj.done === false) {
+                    console.log('arr');
+                    console.log(arr);
+                    console.log(obj.id);
+                    console.log(id);
+                    console.log(obj.done);
+                    obj.done = true;
+                } else {
+                    // console.log(obj.id);
+                    // console.log(id);
+                    // console.log(obj.done);
+                    obj.done = false;
+                }
+            });
+        }
+        //Функция добавления и удаления дел которая вызывается при наличии значений по умолчанию или ручном вводе
         function addItemToDom(todoItem) {
             todoList.append(todoItem.item);
-                    
+                    //окрашиваем в зеленый если отмечен или наоборот убираем окраску через toggle
                     todoItem.buttonDone.addEventListener("click", function (){
+                        let idInput = todoItem.item.getAttribute('id');
+                        let returnArray1 = JSON.parse(localStorage.getItem(title));
+                        console.log('arrayItems Исходный');
+                        console.log(returnArray1);
                         todoItem.item.classList.toggle('list-group-item-success');
+                        changeItemDone(returnArray1, idInput);
+                        console.log('arrayItems1');
+                        console.log(returnArray1);
+                        localStorage.setItem(title, JSON.stringify(returnArray1));
                     });
-        
+                    //запрос на удаление и удаление элемента
                     todoItem.buttonDelete.addEventListener("click", function (){
                         if (confirm('Хотите удалить?')) {
                             todoItem.item.remove();
@@ -103,6 +134,7 @@
                     });
         }
 
+        //Блокировка кнопки создания элемента если в поле для ввода пусто
         todoItemForm.input.addEventListener('input', function () {
             if (!todoItemForm.input.value) {
                 todoItemForm.button.disabled = true;
@@ -111,9 +143,35 @@
             todoItemForm.button.disabled = false;
             }
         });
+        let objLocal = {};
+        var arrayItems = [];
+        var returnArray = JSON.parse(localStorage.getItem(title));
+        //присваеваем массив из localStorage в массив с которым будем работать
+        arrayItems = returnArray || [];
+        console.log(returnArray);
+        console.log('returnArray[]:');
 
+        //добавляем данные из локалсторедж в app
+
+        //перебор массива с обектами
+        for (const key in returnArray) {
+                let object2 = returnArray[key]
+                //перебор объекта из массива
+                for (const key2 in object2) {
+                    //проверка данные строка
+                    if (object2[key2] === object2['name']) {
+                        console.log(object2[key2]);
+                        var todoItem = createTodoItem(object2[key2]);
+                        addItemToDom(todoItem);
+                    //проверка данные булеан?
+                    } else if (object2[key2] === true) {
+                        todoItem.item.classList.toggle('list-group-item-success');
+                    }
+                }
+        }
+
+        //определяем id списка кнопки
         todoItemForm.form.addEventListener('submit', function (e) {
-            console.log(todoItemForm.button.disabled);
             //предотвращаем стандартное действие браузера при отправке формы (перезагрузка страницы)
             e.preventDefault();
 
@@ -123,6 +181,17 @@
                 return;
             }
             let todoItem = createTodoItem(todoItemForm.input.value);
+            objLocal = {
+                name: todoItemForm.input.value,
+                id: todoItem.idItem,
+                done: false,
+            }
+            console.log('objLocal');
+            console.log(objLocal);
+            arrayItems.push(objLocal);
+            console.log('arrayItems');
+            console.log(arrayItems);
+            localStorage.setItem(title, JSON.stringify(arrayItems));
             addItemToDom(todoItem);
             //создаем и добавляем в список (ul) новое дело (li) с названием из поля ввода фармы
             // todoList.append(createTodoItem(todoItemForm.input.value).item);
