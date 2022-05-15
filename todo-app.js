@@ -39,7 +39,7 @@
         return list;
     }
     //создаем и возвращаем дело
-    function createTodoItem(name) {
+    function createTodoItem(name, id) {
         let item = document.createElement('li');
         let buttonGroup = document.createElement('div');
         let buttonDone = document.createElement('button');
@@ -48,8 +48,11 @@
         //Помещаем передаваемое название в элемент списка
         item.textContent = name;
         item.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-        let idItem = 'id' + idTodo;
-        item.setAttribute('id','id' + idTodo++);
+        let idItem = Date.now();
+        if (!id) {
+            id = idItem;
+        }
+        item.setAttribute('id', id);
         
         buttonGroup.classList.add('btn-group', 'btn-group-sm');
         buttonDone.classList.add('btn', 'btn-success');
@@ -96,7 +99,10 @@
         }
         //функция меняющая состояние done на противоположное
         function changeItemDone(arr, id) {
+            id = parseInt(id);
+            console.log(id);
             arr.map(obj => {
+                console.log(obj.id);
                 if (obj.id === id) {
                     obj.done = !obj.done;
                 }
@@ -105,9 +111,7 @@
         //функция удаляющая дело
         function deleteItem(arr, id) {
             arr.forEach(function(item, i, arr) {
-                console.log(item.id);
-                console.log(id);
-                if (item.id === id) {
+                if (item.id === +id) {
                     arr.splice(i, 1);
                 }
             });
@@ -151,22 +155,16 @@
         arrayItems = returnArray || [];
 
         //добавляем данные из локалсторедж в app
-
         //перебор массива с обектами
-        for (const key in returnArray) {
-                let object2 = returnArray[key]
-                //перебор объекта из массива
-                for (const key2 in object2) {
-                    //проверка данные строка
-                    if (object2[key2] === object2['name']) {
-                        console.log(object2[key2]);
-                        var todoItem = createTodoItem(object2[key2]);
-                        addItemToDom(todoItem);
-                    //проверка данные булеан?
-                    } else if (object2[key2] === true) {
-                        todoItem.item.classList.toggle('list-group-item-success');
-                    }
+        if (!!arrayItems) {
+            arrayItems.forEach(function(item) {
+                var todoItem = createTodoItem(item.name, item.id);
+                addItemToDom(todoItem);
+                if (item.done === true) {
+                    //переключает класс дела
+                    todoItem.item.classList.toggle('list-group-item-success');
                 }
+            });
         }
 
         //определяем id списка кнопки
@@ -185,6 +183,8 @@
                 id: todoItem.idItem,
                 done: false,
             }
+            returnArray = JSON.parse(localStorage.getItem(title));
+            arrayItems = returnArray || [];
             arrayItems.push(objLocal);
             localStorage.setItem(title, JSON.stringify(arrayItems));
             addItemToDom(todoItem);
