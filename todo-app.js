@@ -16,6 +16,7 @@
 
         form.classList.add('input-group', 'mb-3');
         input.classList.add('form-control');
+        input.setAttribute('id', 'input');
         input.placeholder = "Введите название нового дела";
         buttonWrapper.classList.add('input-group-append');
         button.classList.add('btn', 'btn-primary');
@@ -81,6 +82,7 @@
 
         container.append(todoAppTitle);
         container.append(todoItemForm.form);
+        document.getElementById("input").focus();
         container.append(todoList);
 
         //Проверка на наличие значений по умолчанию (в obj) и запуск функции добавления если такие есть
@@ -155,7 +157,7 @@
         arrayItems = returnArray || [];
 
         //добавляем данные из локалсторедж в app
-        //перебор массива с обектами
+        //перебор массива с обектами через forEach
         if (!!arrayItems) {
             arrayItems.forEach(function(item) {
                 var todoItem = createTodoItem(item.name, item.id);
@@ -193,6 +195,7 @@
 
             //обнуляем значение в поле ввода формы, чтобы пользователь не стирал
             todoItemForm.input.value = '';
+            document.getElementById("input").focus();
             todoItemForm.button.disabled = true;
         });
     }
