@@ -94,17 +94,23 @@
                 }
             }
         }
+        //функция меняющая состояние done на противоположное
         function changeItemDone(arr, id) {
-            // arr.map(obj => {
-            //     if (obj.id === id && obj.done === false) {
-            //         obj.done = true;
-            //     } else if (obj.id === id && obj.done !== false) {
-            //         obj.done = false;
-            //     }
-            // });
-            const index = id.split('id')[1];
-            arr[+index].done =!arr[+index].done;
-            
+            arr.map(obj => {
+                if (obj.id === id) {
+                    obj.done = !obj.done;
+                }
+            });
+        }
+        //функция удаляющая дело
+        function deleteItem(arr, id) {
+            arr.forEach(function(item, i, arr) {
+                console.log(item.id);
+                console.log(id);
+                if (item.id === id) {
+                    arr.splice(i, 1);
+                }
+            });
         }
         //Функция добавления и удаления дел которая вызывается при наличии значений по умолчанию или ручном вводе
         function addItemToDom(todoItem) {
@@ -113,18 +119,18 @@
                     todoItem.buttonDone.addEventListener("click", function (){
                         let idInput = todoItem.item.getAttribute('id');
                         let returnArray1 = JSON.parse(localStorage.getItem(title));
-                        console.log('arrayItems Исходный');
-                        console.log(returnArray1);
                         todoItem.item.classList.toggle('list-group-item-success');
                         changeItemDone(returnArray1, idInput);
-                        console.log('arrayItems1');
-                        console.log(returnArray1);
                         localStorage.setItem(title, JSON.stringify(returnArray1));
                     });
                     //запрос на удаление и удаление элемента
                     todoItem.buttonDelete.addEventListener("click", function (){
+                        returnArray1 = JSON.parse(localStorage.getItem(title));
+                        idInput = todoItem.item.getAttribute('id');
                         if (confirm('Хотите удалить?')) {
                             todoItem.item.remove();
+                            deleteItem(returnArray1, idInput);
+                            localStorage.setItem(title, JSON.stringify(returnArray1));
                         }
                     });
         }
@@ -143,8 +149,6 @@
         var returnArray = JSON.parse(localStorage.getItem(title));
         //присваеваем массив из localStorage в массив с которым будем работать
         arrayItems = returnArray || [];
-        console.log(returnArray);
-        console.log('returnArray[]:');
 
         //добавляем данные из локалсторедж в app
 
@@ -181,11 +185,7 @@
                 id: todoItem.idItem,
                 done: false,
             }
-            console.log('objLocal');
-            console.log(objLocal);
             arrayItems.push(objLocal);
-            console.log('arrayItems');
-            console.log(arrayItems);
             localStorage.setItem(title, JSON.stringify(arrayItems));
             addItemToDom(todoItem);
             //создаем и добавляем в список (ul) новое дело (li) с названием из поля ввода фармы
